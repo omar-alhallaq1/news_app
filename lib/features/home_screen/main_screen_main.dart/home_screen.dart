@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:news_app/core/constans/constans.dart';
 import 'package:news_app/core/routing/app_routes.dart';
 import 'package:news_app/core/stayles/app_text_style.dart';
 import 'package:news_app/features/home_screen/modles/top_headlines_modle.dart';
@@ -25,23 +26,38 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // جلب البيانات من الـ Service
     topHeadlinesFuture = HomeScreenServices().gettopheadlinesArticles();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // حل مشكلة الـ 140 بكسل التي ظهرت عند فتح الكيبورد
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: const Color(0xffE9EEFA),
-        toolbarHeight: 120,
+        toolbarHeight: 80.h,
         title: Text(
           "explore".tr(),
           style: AppTextStyles.titleTextstyle.copyWith(color: Colors.black),
         ),
-        actions: [SearchTextFieldWidjet()],
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (context.locale.languageCode == 'en') {
+                context.setLocale(const Locale('ar'));
+              } else {
+                context.setLocale(const Locale('en'));
+              }
+              AppConstants.lang = context.locale.languageCode;
+            },
+            icon: const Icon(Icons.language, color: Colors.black),
+          ),
+          const SearchTextFieldWidjet(),
+        ],
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<ArticalModles?>(
         future: topHeadlinesFuture,
         builder: (context, asyncSnapshot) {
           if (asyncSnapshot.connectionState == ConnectionState.waiting) {
@@ -56,8 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           } else if (asyncSnapshot.hasData) {
-            ArticalModles topHeadLinesModle =
-                asyncSnapshot.data as ArticalModles;
+            ArticalModles topHeadLinesModle = asyncSnapshot.data!;
 
             if (topHeadLinesModle.totalResults == 0) {
               return Center(child: Text("noresult".tr()));
@@ -147,14 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final article = topHeadLinesModle.articles![index];
 
-                        return ArticalCardWidget(
-                          title: article.title ?? "No Title",
-                          description: article.description ?? "No Description",
-                          date: DateFormat(
-                            'yyyy-MM-dd – kk:mm',
-                          ).format(article.publishedAt ?? DateTime.now()),
-                          imageUrl: article.urlToImage ?? "",
-                        );
+                        return ArticalCardWidget(article: article);
                       },
                     ),
                   ),
@@ -162,12 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else {
-            return Center(
-              child: Text(
-                "No data available",
-                style: AppTextStyles.black14semibold,
-              ),
-            );
+            return const Center(child: Text("No data available"));
           }
         },
       ),

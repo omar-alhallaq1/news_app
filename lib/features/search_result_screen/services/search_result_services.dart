@@ -10,7 +10,11 @@ class SearchResultScreenServices {
     try {
       final response = await DioHelper.getrequest(
         endpoint: ApiEndpoints.searchendpoint,
-        query: {"apiKey": AppConstants.apiKey, "q": query},
+        query: {
+          "apiKey": AppConstants.apiKey,
+          "q": query,
+          "language": AppConstants.lang,
+        },
       );
 
       // التعديل هنا: فحص الـ status داخل الـ Map مباشرة

@@ -64,14 +64,7 @@ class SearchResultScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final article = topHeadLinesModle.articles![index];
 
-                        return ArticalCardWidget(
-                          title: article.title ?? "No Title",
-                          description: article.description ?? "No Description",
-                          date: DateFormat(
-                            'yyyy-MM-dd – kk:mm',
-                          ).format(article.publishedAt ?? DateTime.now()),
-                          imageUrl: article.urlToImage ?? "",
-                        );
+                        return ArticalCardWidget(article: article);
                       },
                     ),
                   ),

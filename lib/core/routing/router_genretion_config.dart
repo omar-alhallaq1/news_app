@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/core/routing/app_routes.dart';
+import 'package:news_app/features/Artical_details_screen/artical_details_screen.dart';
 import 'package:news_app/features/home_screen/main_screen_main.dart/home_screen.dart';
+import 'package:news_app/features/home_screen/modles/top_headlines_modle.dart';
 import 'package:news_app/features/search_result_screen/search_result_screen.dart';
 
 class RouterGenretionConfig {
@@ -29,7 +31,10 @@ class RouterGenretionConfig {
       GoRoute(
         name: AppRoutes.articalDetailscreen,
         path: AppRoutes.articalDetailscreen,
-        builder: (context, state) => Container(),
+        builder: (context, state) {
+          final article = state.extra as Article;
+          return ArticalDetailsScreen(article: article);
+        },
       ),
     ],
   );
