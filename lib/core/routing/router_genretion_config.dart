@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/core/routing/app_routes.dart';
 import 'package:news_app/features/Artical_details_screen/artical_details_screen.dart';
+import 'package:news_app/features/home_screen/cuibt/home_cuibt.dart';
 import 'package:news_app/features/home_screen/main_screen_main.dart/home_screen.dart';
 import 'package:news_app/features/home_screen/modles/top_headlines_modle.dart';
 import 'package:news_app/features/search_result_screen/search_result_screen.dart';
@@ -13,7 +15,11 @@ class RouterGenretionConfig {
       GoRoute(
         name: AppRoutes.homescreen,
         path: AppRoutes.homescreen,
-        builder: (context, state) => HomeScreen(),
+
+        builder: (context, state) => BlocProvider(
+          create: (context) => HomeCuibt(),
+          child: const HomeScreen(),
+        ),
       ),
       GoRoute(
         name: AppRoutes.searchScreen,

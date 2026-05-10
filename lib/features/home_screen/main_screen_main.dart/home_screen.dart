@@ -1,13 +1,18 @@
+import 'dart:math';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/core/constans/constans.dart';
 import 'package:news_app/core/routing/app_routes.dart';
 import 'package:news_app/core/stayles/app_text_style.dart';
+import 'package:news_app/features/home_screen/cuibt/home_cuibt.dart';
+import 'package:news_app/features/home_screen/cuibt/home_states.dart';
 import 'package:news_app/features/home_screen/modles/top_headlines_modle.dart';
-import 'package:news_app/features/home_screen/services/home_screen_services.dart';
+import 'package:news_app/features/home_screen/repo/home_repo.dart';
 import 'package:news_app/features/home_screen/widget/artical_card_widget.dart';
 import 'package:news_app/features/home_screen/widget/custom_categroy_item_widget.dart';
 import 'package:news_app/features/home_screen/widget/search_text_field_widjet.dart';
@@ -27,7 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // جلب البيانات من الـ Service
-    topHeadlinesFuture = HomeScreenServices().gettopheadlinesArticles();
+    topHeadlinesFuture = HomeRepo().gettopheadlinesArticles();
+    context.read<HomeCuibt>().getTopHeadlines(); // جلب البيانات من الـ Cuibt
   }
 
   @override
@@ -57,26 +63,21 @@ class _HomeScreenState extends State<HomeScreen> {
           const SearchTextFieldWidjet(),
         ],
       ),
-      body: FutureBuilder<ArticalModles?>(
-        future: topHeadlinesFuture,
-        builder: (context, asyncSnapshot) {
-          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+      body: BlocBuilder<HomeCuibt, HomeStates>(
+        builder: (context, state) {
+          if (state is LoadingTopHeadlinesstate) {
             return const Center(
               child: CircularProgressIndicator(color: Colors.black),
             );
-          } else if (asyncSnapshot.hasError) {
+          } else if (state is ErrorTopHeadlinesstate) {
             return Center(
               child: Text(
-                "Error: ${asyncSnapshot.error}",
+                "Error: ${state.error}",
                 style: AppTextStyles.black14semibold,
               ),
             );
-          } else if (asyncSnapshot.hasData) {
-            ArticalModles topHeadLinesModle = asyncSnapshot.data!;
-
-            if (topHeadLinesModle.totalResults == 0) {
-              return Center(child: Text("noresult".tr()));
-            }
+          } else if (state is SucessTopHeadlinesstate) {
+            ArticalModles topHeadLinesModle = state.topHeadLinesModle;
 
             return Column(
               children: [
@@ -170,7 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else {
-            return const Center(child: Text("No data available"));
+            return Center(
+              child: Text(
+                "No data available",
+                style: AppTextStyles.black14semibold,
+              ),
+            ); // حالة افتراضية في حال لم يكن هناك حالة معروفة
           }
         },
       ),

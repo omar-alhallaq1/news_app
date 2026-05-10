@@ -5,12 +5,16 @@ import 'package:news_app/core/networking/api_endpoints.dart';
 import 'package:news_app/core/networking/dio_helper.dart';
 import 'package:news_app/features/home_screen/modles/top_headlines_modle.dart';
 
-class HomeScreenServices {
-  Future<ArticalModles?> gettopheadlinesArticles() async {
+class SearchResultScreenServices {
+  Future<ArticalModles?> searchitembyname(String query) async {
     try {
       final response = await DioHelper.getrequest(
-        endpoint: ApiEndpoints.topHeadlinesEndpoint,
-        query: {"country": "us", "apiKey": AppConstants.apiKey},
+        endpoint: ApiEndpoints.searchendpoint,
+        query: {
+          "apiKey": AppConstants.apiKey,
+          "q": query,
+          "language": AppConstants.lang,
+        },
       );
 
       // التعديل هنا: فحص الـ status داخل الـ Map مباشرة
